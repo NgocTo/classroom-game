@@ -27,8 +27,9 @@ var width = 2917;
 var height = 1564;
 var color = light; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-
-var frame = new Frame(scaling, width, height, color, outerColor);
+var assets = ["paperball.png","glue.png","ruler.png","pencil.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png"];
+var path = "assets/";
+var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter());
 frame.on("ready", function() {
     zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
 
@@ -43,7 +44,9 @@ frame.on("ready", function() {
     // put your code here (you can delete this sample code)
 
     // with chaining - can also assign to a variable for later access
+    frame.asset("classroom.png").addTo();
 
+    var items = [frame.asset("paperball.png"),frame.asset("glue.png"),frame.asset("ruler.png"),frame.asset("pencil.png")];
 
     stage.update(); // this is needed to show any changes
 
