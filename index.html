@@ -47,9 +47,9 @@ frame.on("ready", function() {
     frame.asset("classroom.png").addTo();
 
     var items = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png"];
-    // loop(items, function(item, i) { // function version of loop
-    //     frame.asset(item).center();
-    // });
+    loop(items, function(item, i) { // function version of loop
+        frame.asset(item).sca(0.1).center();
+    });
     interval(5000, function(e){
         var item = frame.asset(items[rand(items.length-1)]).sca(0.1).center().mov(null, -50);
         var boom;
@@ -66,6 +66,68 @@ frame.on("ready", function() {
         });
         stage.update();
     });
+
+    //enter Squiggle path for pencil Target
+var data =
+[[0,0,0,0,-30,0,30,0],[67.2,-80.4,0,0,-30,0,30,0],[138.3,-144.3,0,0,-30,0,30,0],[213.3,-236.4,0,0,-30,0,30,0],[323.4,-339.3,0,0,-30,0,30,0]];
+// var pathStarts = [
+//   {x:1180,y:1070}
+// ];
+
+// for (var i=0; i<data.length; i++) {
+//   var d = data[i];
+//   // zog(d[0][4])
+// }
+
+    // Throw items on desk to target on the board
+    // loop(data, function (d) {
+    var squiggle = new Squiggle({
+      color:black,
+      thickness:10,
+      points:data
+      // interactive:false;
+    })
+    .pos(1180,1070)
+    // .bot();
+
+    squiggle.on("mousedown", function () {
+			zog("mousedown")
+			pencil.pauseAnimate(false);
+			timeout(450, function () {
+				pencil.point.removeFrom(squiggle);
+				stage.update();
+			});
+		});
+
+  //make pencil aka object thrown at Target
+  pencil = frame.asset("pencil.png");
+  pencil.loc(squiggle.pointObjects[0])
+  .sca(0.1)
+  .animate({
+    props:{path:squiggle},
+    time:500,
+    ease:"linear",
+    // call:function () {
+    // 	point.removeFrom();
+    // }
+    startPaused:true
+  }); // , orient:new Point(0,0)}, 3500);
+
+// });
+
+    // after the Squiggle function
+    new TransformManager(squiggle);
+    frame.on("keydown", function (e) {
+      zog(e.keyCode);
+      if (e.keyCode == 82) {
+          squiggle.recordPoints(true);
+      }
+  });
+    //enter Squiggle path for pencil Target
+
+
+
+
     stage.update(); // this is needed to show any changes
 
 }); // end of ready
