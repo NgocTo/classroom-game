@@ -41,15 +41,9 @@ frame.on("ready", function() {
     // see http://zimjs.com/docs.html for documentation
     // see http://zimjs.com/bits.html for 64 Interactive Media techniques
 
-    // put your code here (you can delete this sample code)
-
-    // with chaining - can also assign to a variable for later access
     frame.asset("classroom.png").addTo();
 
     var items = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png"];
-    loop(items, function(item, i) { // function version of loop
-        frame.asset(item).sca(0.1).center();
-    });
     interval(5000, function(e){
         var item = frame.asset(items[rand(items.length-1)]).sca(0.1).center().mov(null, -50);
         var boom;
@@ -68,61 +62,56 @@ frame.on("ready", function() {
     });
 
     //enter Squiggle path for pencil Target
-var data = [[0,0,0,0,-51.8,118.8,51.8,-118.8],[277.9,-339.3,0,0,-115.1,61.4,115.1,-61.4]];
-// var pathStarts = [
-//   {x:1180,y:1070}
-// ];
+    var data = [[0,0,0,0,-51.8,118.8,51.8,-118.8],[277.9,-339.3,0,0,-115.1,61.4,115.1,-61.4]];
+    // var pathStarts = [
+    //   {x:1180,y:1070}
+    // ];
 
-// for (var i=0; i<data.length; i++) {
-//   var d = data[i];
-//   // zog(d[0][4])
-// }
 
     // Throw items on desk to target on the board
-    // loop(data, function (d) {
     var squiggle = new Squiggle({
-      color:black,
-      thickness:10,
-      points:data,
-      interactive:false
+        color:black,
+        thickness:1,
+        points:data,
+        showControls:false,
+        interactive:false
     })
     .pos(1180,1070)
     // .bot();
 
-    squiggle.on("mousedown", function () {
-			zog("mousedown")
-			pencil.pauseAnimate(false);
-			timeout(450, function () {
-				pencil.point.removeFrom(squiggle);
-				stage.update();
-			});
-		});
+    // make pencil aka object thrown at Target
+    pencil = frame.asset("pencil.png")
+        .sca(0.1)
+        .centerReg()
+        .loc(squiggle.pointObjects[0])
+        .animate({
+            props:{path:squiggle},
+            time:500,
+            ease:"linear",
+                call:function () {
+                    pencil.removeFrom();
+                },
+        startPaused:true
+        });
 
-  //make pencil aka object thrown at Target
-  pencil = frame.asset("pencil.png");
-  pencil.loc(squiggle.pointObjects[0])
-  .sca(0.1)
-  .animate({
-    props:{path:squiggle},
-    time:500,
-    ease:"linear",
-    // call:function () {
-    // 	point.removeFrom();
-    // }
-    startPaused:true
-  }); // , orient:new Point(0,0)}, 3500);
+    // animate pencil on click 
+    pencil.on("mousedown", function () {
+        zog("mousedown")
+        pencil.pauseAnimate(false);
+        timeout(450, function () {
+            pencil.removeFrom(squiggle);
+            stage.update();
+        });
+    });
 
-// });
-
-    // after the Squiggle function
-    new TransformManager(squiggle);
-    frame.on("keydown", function (e) {
-      zog(e.keyCode);
-      if (e.keyCode == 82) {
-          squiggle.recordPoints(true);
-      }
-  });
-    //enter Squiggle path for pencil Target
+    // record points
+    // new TransformManager(squiggle);
+    // frame.on("keydown", function (e) {
+    //     zog(e.keyCode);
+    //     if (e.keyCode == 82) {
+    //         squiggle.recordPoints(true);
+    //     }
+    // });
 
 
 
