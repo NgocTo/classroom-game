@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>ZIM Frame - Fit Template</title>
+<title>Classroom Target Game</title>
 
 <!-- Welcome to ZIM at https://zimjs.com - Code Creativity!              	        -->
 <!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS https://createjs.com -->
@@ -44,22 +44,22 @@ frame.on("ready", function() {
     frame.asset("classroom.png").addTo();
 
     var items = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png"];
-    interval(5000, function(e){
-        var item = frame.asset(items[rand(items.length-1)]).sca(0.1).center().mov(null, -50);
-        var boom;
-        timeout(3000, function (e) {
-            boom = frame.asset("boom.png")
-                .sca(0.1)
-                .center()
-                .mov(null,-50)
-                // .bot()
-        });
-        timeout(5000, function (e) {
-            item.removeFrom();
-            boom.removeFrom();
-        });
-        stage.update();
-    });
+    // interval(5000, function(e){
+    //     var item = frame.asset(items[rand(items.length-1)]).sca(0.1).center().mov(null, -50);
+    //     var boom;
+    //     timeout(3000, function (e) {
+    //         boom = frame.asset("boom.png")
+    //             .sca(0.1)
+    //             .center()
+    //             .mov(null,-50)
+    //             // .bot()
+    //     });
+    //     timeout(5000, function (e) {
+    //         item.removeFrom();
+    //         boom.removeFrom();
+    //     });
+    //     stage.update();
+    // });
 
     //enter Squiggle path for pencil Target
     var data = [[0,0,0,0,-51.8,118.8,51.8,-118.8],[277.9,-339.3,0,0,-115.1,61.4,115.1,-61.4]];
@@ -67,8 +67,8 @@ frame.on("ready", function() {
     //   {x:1180,y:1070}
     // ];
 
-
-    // Throw items on desk to target on the board
+     // PENCIL TARGET
+    // Throw pencil on desk to target on the board
     var squiggle = new Squiggle({
         color:black,
         thickness:1,
@@ -94,7 +94,7 @@ frame.on("ready", function() {
         startPaused:true
         });
 
-    // animate pencil on click 
+    // animate pencil on click
     pencil.on("mousedown", function () {
         zog("mousedown")
         pencil.pauseAnimate(false);
@@ -104,15 +104,156 @@ frame.on("ready", function() {
         });
     });
 
-    // record points
-    // new TransformManager(squiggle);
+////////////////////////////
+    // GLUE TARGET
+    // Glue Target Path
+    var data2 = [[0,0,0,0,45.8,105.1,-45.8,-105.1],[-305.9,-339.3,0,0,68.4,6.7,-68.4,-6.7]];
+
+    // Throw glue on desk to target on the board
+    var squiggle2 = new Squiggle({
+       color:black,
+       thickness:1,
+       points:data2,
+       showControls:false,
+       interactive:false
+    })
+    .pos(1770,1070)
+    // .bot();
+
+    // make glue aka object thrown at Target
+    glue = frame.asset("glue.png")
+       .sca(0.1)
+       .centerReg()
+       .loc(squiggle2.pointObjects[0])
+       .animate({
+           props:{path:squiggle2},
+           time:500,
+           ease:"linear",
+               call:function () {
+                   glue.removeFrom();
+               },
+       startPaused:true
+       });
+
+    // animate glue on click
+    glue.on("mousedown", function () {
+       zog("mousedown")
+       glue.pauseAnimate(false);
+       timeout(450, function () {
+           glue.removeFrom(squiggle2);
+           stage.update();
+       });
+    });
+
+    //record points
+    // new TransformManager(squiggle2);
     // frame.on("keydown", function (e) {
     //     zog(e.keyCode);
     //     if (e.keyCode == 82) {
-    //         squiggle.recordPoints(true);
+    //         squiggle2.recordPoints(true);
     //     }
     // });
 
+////////////////////////////
+    // PAPERBALL TARGET
+    // Glue Target Path
+    var data3 = [[0,0,0,0,64.2,127.2,-64.2,-127.2],[-285.7,-523.3,0,0,29.8,50.9,-29.8,-50.9]];
+
+    // Throw paperball on desk to target on the board
+    var squiggle3 = new Squiggle({
+      color:black,
+      thickness:1,
+      points:data3,
+      showControls:false,
+      interactive:false
+    })
+    .pos(1750,1255)
+    // .bot();
+
+    // make paperball aka object thrown at Target
+    pball = frame.asset("paperball.png")
+      .sca(0.1)
+      .centerReg()
+      .loc(squiggle3.pointObjects[0])
+      .animate({
+           props:{path:squiggle3},
+           time:500,
+           ease:"linear",
+               call:function () {
+                   pball.removeFrom();
+               },
+      startPaused:true
+      });
+
+    // animate paperball on click
+    pball.on("mousedown", function () {
+      zog("mousedown")
+      pball.pauseAnimate(false);
+      timeout(450, function () {
+           pball.removeFrom(squiggle3);
+           stage.update();
+      });
+    });
+
+    //record points
+    // new TransformManager(squiggle3);
+    // frame.on("keydown", function (e) {
+    //     zog(e.keyCode);
+    //     if (e.keyCode == 82) {
+    //         squiggle3.recordPoints(true);
+    //     }
+    // });
+
+
+    ////////////////////////////
+        // RULER TARGET
+        // Ruler Target Path
+        var data4 = [[0,0,0,0,-90.4,127.2,90.4,-127.2],[371.2,-523.3,0,0,-53,84,53,-84]];
+
+        // Throw paperball on desk to target on the board
+        var squiggle4 = new Squiggle({
+          color:black,
+          thickness:1,
+          points:data4,
+          showControls:false
+          // interactive:false
+        })
+        .pos(1090,1255)
+        // .bot();
+
+        // make ruler aka object thrown at Target
+        ruler = frame.asset("ruler.png")
+          .sca(0.1)
+          .centerReg()
+          .loc(squiggle4.pointObjects[0])
+          .animate({
+               props:{path:squiggle4},
+               time:500,
+               ease:"linear",
+                   call:function () {
+                       ruler.removeFrom();
+                   },
+          startPaused:true
+          });
+
+        // animate ruler on click
+        ruler.on("mousedown", function () {
+          zog("mousedown")
+          ruler.pauseAnimate(false);
+          timeout(450, function () {
+               ruler.removeFrom(squiggle4);
+               stage.update();
+          });
+        });
+
+        //record points
+        // new TransformManager(squiggle4);
+        // frame.on("keydown", function (e) {
+        //     zog(e.keyCode);
+        //     if (e.keyCode == 82) {
+        //         squiggle4.recordPoints(true);
+        //     }
+        // });
 
 
 
