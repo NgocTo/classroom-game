@@ -63,13 +63,16 @@ frame.on("ready", function() {
             boom = frame.asset("boom.png")
                 .sca(0.1)
                 .center()
-                .mov(null,-50)
-                // .bot()
+                .mov(null,-50);
+            // loop(items, function(itm, i) {
+            //     itm.on("click", function(e) {
+            //         zog("clicking");
+            //     })
+            // })
         });
         timeout(3000, function (e) {
             item.removeFrom();
             boom.removeFrom();
-            zog("removing");
             stage.update();
         });
         stage.update();
@@ -115,7 +118,6 @@ frame.on("ready", function() {
     pencil.on("mousedown", function () {
         pencil.pauseAnimate(false);
         timeout(2000, function() {
-            zog(squiggle.pointControls[0].x);
             pencil.loc(squiggle.pointControls[0]);
             stage.update();
         })
@@ -136,6 +138,7 @@ frame.on("ready", function() {
     glue = frame.asset("glue.png")
         .sca(0.1)
         .centerReg()
+        .rot(90)
         .loc(squiggle2.pointObjects[0])
         .animate({
             props:{path:squiggle2},
