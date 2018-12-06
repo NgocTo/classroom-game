@@ -68,8 +68,7 @@ frame.on("ready", function() {
     });
 
     //enter Squiggle path for pencil Target
-var data =
-[[0,0,0,0,-30,0,30,0],[67.2,-80.4,0,0,-30,0,30,0],[138.3,-144.3,0,0,-30,0,30,0],[213.3,-236.4,0,0,-30,0,30,0],[323.4,-339.3,0,0,-30,0,30,0]];
+var data = [[0,0,0,0,-51.8,118.8,51.8,-118.8],[277.9,-339.3,0,0,-115.1,61.4,115.1,-61.4]];
 // var pathStarts = [
 //   {x:1180,y:1070}
 // ];
@@ -84,8 +83,8 @@ var data =
     var squiggle = new Squiggle({
       color:black,
       thickness:10,
-      points:data
-      // interactive:false;
+      points:data,
+      interactive:false
     })
     .pos(1180,1070)
     // .bot();
