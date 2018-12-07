@@ -27,7 +27,7 @@ var width = 2917;
 var height = 1564;
 var color = light; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png"];
+var assets = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png", "board.png"];
 var path = "assets/";
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter());
 frame.on("ready", function() {
@@ -40,39 +40,55 @@ frame.on("ready", function() {
     // see http://zimjs.com/learn.html for video and code tutorials
     // see http://zimjs.com/docs.html for documentation
     // see http://zimjs.com/bits.html for 64 Interactive Media techniques
+    
+    var main = new Container(stageW, stageH);
+    var detention = new Container(stageW, stageH);
 
-    frame.asset("classroom.png").addTo();
+    var pages = new Pages({
+        holder: stage,
+        pages: [
+            // swipe:["right", "left", "down", "up"]
+            {page: main, swipe: [null,detention,null,null]},
+            {page: detention, swipe: [main,null,null,null]},
+        ],
+        transition: "slide",
+        speed: 500
+	}).addTo(stage);
+
+    frame.asset("classroom.png").addTo(main);
 
     // Make labels
     var points = 3;
-    new Label({
+    var pointsLabel = new Label({
         text: "Points: " + points,
         color: white,
         size: 70,
         backgroundColor: blue,
         corner: 10,
         padding: 15
-    }).pos(50, 50);
+    }).pos(80, 80, true, null, main);
 
-    var board = new Container(stageW, stageH).addTo();
-    var items = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png"];
+    var board = new Container(stageW, stageH).addTo(main);
+    var items = ["paperball.png","glue.png","ruler.png","pencil.png"];
+    var currentItem;
     var showItems = interval(3000, function(e){
-        var item = frame.asset(items[rand(items.length-1)]).clone().sca(0.1).center(board).mov(null, -50);
+        var item = frame.asset(items[rand(items.length-1)]).clone().sca(0.1).center(board).mov(30, -50);
         var boom;
         timeout(1500, function (e) {
             boom = frame.asset("boom.png")
-                .sca(0.1)
-                .center()
-                .mov(null,-50);
-            // loop(items, function(itm, i) {
-            //     itm.on("click", function(e) {
-            //         zog("clicking");
-            //     })
-            // })
+                .sca(0.15)
+                .rot(-90)
+                .center(board)
+                .mov(15,-50)
+                .alp(0.7)
+                .bot();
+            zog(item.id);
+            currentItem = item.id;
         });
         timeout(3000, function (e) {
             item.removeFrom();
             boom.removeFrom();
+            currentItem = "";
             stage.update();
         });
         stage.update();
@@ -84,7 +100,7 @@ frame.on("ready", function() {
     // Glue Target Path
     var data2 = [[0,0,0,0,45.8,105.1,-45.8,-105.1],[-305.9,-339.3,0,0,68.4,6.7,-68.4,-6.7]];
     // Ball Target Path
-    var data3 = [[0,0,0,0,64.2,127.2,-64.2,-127.2],[-285.7,-523.3,0,0,29.8,50.9,-29.8,-50.9]];
+    var data3 = [[0,0,0,0,64.2,127.2,-64.2,-127.2],[-404.9,-509.6,0,0,105.4,7.4,-105.4,-7.4]];
     // Ruler Target Path
     var data4 = [[0,0,0,0,-90.4,127.2,90.4,-127.2],[371.2,-523.3,0,0,-53,84,53,-84]];
 
@@ -97,12 +113,12 @@ frame.on("ready", function() {
         showControls:false,
         interactive:false
     })
-        .pos(1180,1070)
+        .pos(1180,1070, null, null, main)
         .bot();
     // make pencil aka object thrown at Target
     pencil = frame.asset("pencil.png")
         .sca(0.1)
-        .centerReg()
+        .centerReg(main)
         .rot(180)
         .loc(squiggle.pointControls[0])
         .animate({
@@ -116,11 +132,19 @@ frame.on("ready", function() {
         });
    // animate pencil on click
     pencil.on("mousedown", function () {
+        if (pencil.id !== currentItem) {
+            points--;
+            if (points <= 0) {
+                points = 0;
+            }
+            pointsLabel.text = "Points: " + points;
+            stage.update;
+        }
         pencil.pauseAnimate(false);
-        timeout(2000, function() {
+        timeout(1500, function() {
             pencil.loc(squiggle.pointControls[0]);
             stage.update();
-        })
+        });
     });
     ////////////////////////////
     // GLUE TARGET
@@ -132,14 +156,14 @@ frame.on("ready", function() {
         showControls:false,
         interactive:false
     })
-    .pos(1770,1070)
+    .pos(1770,1070, null, null, main)
     .bot();
     // make glue aka object thrown at Target
     glue = frame.asset("glue.png")
         .sca(0.1)
-        .centerReg()
+        .centerReg(main)
         .rot(90)
-        .loc(squiggle2.pointObjects[0])
+        .loc(squiggle2.pointControls[0])
         .animate({
             props:{path:squiggle2},
             time:500,
@@ -151,7 +175,19 @@ frame.on("ready", function() {
         });
     // animate glue on click
     glue.on("mousedown", function () {
+        if (pencil.id !== currentItem) {
+            points--;
+            if (points <= 0) {
+                points = 0;
+            }
+            pointsLabel.text = "Points: " + points;
+            stage.update;
+        }
         glue.pauseAnimate(false);
+        timeout(1500, function() {
+            glue.loc(squiggle2.pointControls[0]);
+            stage.update();
+        });
     });
     ////////////////////////////
     // PAPERBALL TARGET
@@ -163,17 +199,18 @@ frame.on("ready", function() {
         showControls:false,
         interactive:false
     })
-        .pos(1750,1255)
+        .pos(1900,1250, null, null, main)
         .bot();
     // make paperball aka object thrown at Target
     pball = frame.asset("paperball.png")
-        .sca(0.1)
-        .centerReg()
-        .loc(squiggle3.pointObjects[0])
+        .sca(0.07)
+        .centerReg(main)
+        .loc(squiggle3.pointControls[0])
         .animate({
             props:{path:squiggle3},
             time:500,
             ease:"linear",
+            orient: false,
             call:function () {
                 pball.removeFrom();
             },
@@ -181,7 +218,19 @@ frame.on("ready", function() {
     });
     // animate paperball on click
     pball.on("mousedown", function () {
+        if (pencil.id !== currentItem) {
+            points--;
+            if (points <= 0) {
+                points = 0;
+            }
+            pointsLabel.text = "Points: " + points;
+            stage.update;
+        }
         pball.pauseAnimate(false);
+        timeout(1500, function() {
+            pball.loc(squiggle3.pointControls[0]);
+            stage.update();
+        });
     });
     ////////////////////////////
     // RULER TARGET
@@ -193,13 +242,13 @@ frame.on("ready", function() {
         showControls:false,
         interactive:false
     })
-        .pos(1090,1255)
+        .pos(1090,1255, null, null, main)
         .bot();
     // make ruler aka object thrown at Target
     ruler = frame.asset("ruler.png")
         .sca(0.1)
-        .centerReg()
-        .loc(squiggle4.pointObjects[0])
+        .centerReg(main)
+        .loc(squiggle4.pointControls[0])
         .animate({
             props:{path:squiggle4},
             time:500,
@@ -211,15 +260,74 @@ frame.on("ready", function() {
     });
     // animate ruler on click
     ruler.on("mousedown", function () {
+        if (pencil.id !== currentItem) {
+            points--;
+            if (points <= 0) {
+                points = 0;
+            }
+            pointsLabel.text = "Points: " + points;
+            stage.update;
+        }
         ruler.pauseAnimate(false);
+        timeout(1500, function() {
+            ruler.loc(squiggle4.pointControls[0]);
+            stage.update();
+        });
     });
 
+    var checkMiniGameBtn = new Button().pos(100, 100, true, true, main);
+    checkMiniGameBtn.on("click", function() {
+        pages.go(detention, "right");
+        makeMiniGame();
+    })
+
+    // MINI GAME
+    function makeMiniGame() {
+        frame.asset("board.png").sca(2.1).center(detention);
+        var miniGameResult = new Label("", 150, null, "#FFFFB6").center(detention).mov(null, -200);
+        var num1 = rand(1,10);
+        var num2 = rand(1,10);
+        var equation = num1 + "   +   " + num2 + "   =   ";
+        var index = new Label(equation + "?", 150, null, "#FFFFB6" ).center(detention);
+        var ans= num1 + num2;
+        // new Label(ans).pos(750,450)
+
+        var userAns = new TextArea({
+            width: 150, 
+            height: 150, 
+            size: 150, 
+            color:"#FFFFB6"
+        }).center(detention).mov(-100, 200);
+        userAns.on("input", function() {
+            index.text = equation + userAns.text;
+            stage.update();
+        });
+        var button = new Button(75, 75, "GO","#FFFFB6","#DDAC40","#5C736E" )
+            .sca(2)
+            .center(detention)
+            .mov(100, 200)
+
+        button.on("click", function () {
+            if (userAns.text == ans){
+                zog("Correct! Nice job!")
+                var title = "Correct! Nice job!";
+                miniGameResult.text = title;
+                stage.update();
+            } else {
+                var title = "Try Again";
+                miniGameResult.text = title;
+                stage.update();
+            };
+        })
+    }
+    
+
     // record points
-    // new TransformManager(squiggle);
+    // new TransformManager(squiggle3);
     // frame.on("keydown", function (e) {
     //     zog(e.keyCode);
     //     if (e.keyCode == 82) {
-    //         squiggle.recordPoints(true);
+    //         squiggle3.recordPoints(true);
     //     }
     // });
 
