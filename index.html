@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>ZIM Frame - Fit Template</title>
+<title>Detention - 101</title>
 
 <!-- Welcome to ZIM at https://zimjs.com - Code Creativity!              	        -->
 <!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS https://createjs.com -->
@@ -46,269 +46,350 @@ frame.on("ready", function() {
     var main = new Container(stageW, stageH);
     var detention = new Container(stageW, stageH);
     var intro = new Container(stageW, stageH);
-
+    frame.asset("classroom.png").center(main);
+    frame.asset("board.png").sca(2.1).center(detention);
+    var logo = frame.asset("logo.png").sca(1.05, 1.15).center(intro);
     var pages = new Pages({
         holder: stage,
         pages: [
             // swipe:["right", "left", "down", "up"]
+            {page: intro, swipe: [null,null,main,null]},
             {page: main, swipe: [null,detention,null,intro]},
             {page: detention, swipe: [main,null,null,null]},
-            {page: intro, swipe: [null,null,main,null]},
         ],
         transition: "slide",
         speed: 500
 	}).addTo(stage);
+    makeIntro();
+    function makeIntro() {
+        //button to begin the game
+        var playButton = new Button({
+            width:500,
+            height:100,
+            backgroundColor:"#FFFFB6",
+            rollBackgroundColor:"#DDAC40",
+            color:"#5C736E" ,
+            label:"Let's Play",
+            corner:6
+        })
+            .addTo(intro)
+            .center()
+            .mov(0,300)
+        playButton.on("click", function() {
+           pages.go(main, "down");
+           playGame();
+           makeSettings();
+        })
+    }
+    function makeSettings() {
+        var icon = pizzazz.makeIcon("settings", "white");
+        var settings = new Button({
+            width:70,
+            color:white,
+            backgroundColor:blue,
+            rollBackgroundColor:tin,
+            corner:0,
+            icon:icon,
+            shadowColor: -1
+        })
+           .sca(1.55)
+           .center(main)
+           .mov(1350,-650);
+        settings.on("click",function(){pane2.show();})
 
-    var logo = frame.asset("logo.png").addTo(intro);
-
-    var introBtn = new Button().pos(100,100);
-    introBtn.on("click", function() {
-        pages.go(intro, "up");
-    })
-
+        var closeBut = new Button(41,41,"X","black","#444","white","2",5);
+        var closeBut2 = new Button(41,41,"X","black","#444","white","2",5);
+        var newGame = new Button(250,170,"New Game","#FFFFB6","#DDAC40","#5C736E");
+        var instruct = new Button(250,170,"Instructions","#FFFFB6","#DDAC40","#5C736E");
+        var label2 = new Label({text:"OPTIONS", size:100,font:null,color:"white",fontOptions:"bold"});
 
 
-    frame.asset("classroom.png").addTo(main);
-    var icon = pizzazz.makeIcon("settings", "white");
-    var settings = new Button({
-        width:70,
-        color:white,
-        backgroundColor:dark,
-        rollBackgroundColor:tin,
-        corner:0,
-        gradient:0.1,
-        gloss:0.1,
-        icon:icon,
-    })
-    .center(main)
-    .mov(210,null);
-    // Make labels
-    var points = 3;
-    var pointsLabel = new Label({
-        text: "Points: " + points,
-        color: white,
-        size: 70,
-        backgroundColor: blue,
-        corner: 10,
-        padding: 15
-    }).pos(80, 80, true, null, main);
+        var pane2 = new Pane({
+            width: 1000,
+            height: 1000,
+            label:label2,
+            backgroundColor:"#5C736E",
+            resets: false,
+            modal:false});
 
-    var board = new Container(stageW, stageH).addTo(main);
-    var items = ["paperball.png","glue.png","ruler.png","pencil.png"];
-    var currentItem;
-    var showItems = interval(3000, function(e){
-        var item = frame.asset(items[rand(items.length-1)]).clone().sca(0.1).center(board).mov(30, -50);
-        var boom;
-        timeout(1500, function (e) {
-            boom = frame.asset("boom.png")
-                .sca(0.15)
-                .rot(-90)
-                .center(board)
-                .mov(15,-50)
-                .alp(0.7)
-                .bot();
-            zog(item.id);
-            currentItem = item.id;
-        });
-        timeout(3000, function (e) {
-            item.removeFrom();
-            boom.removeFrom();
-            currentItem = "";
+            pane2.addChild(closeBut);
+            pane2.addChild(newGame);
+            pane2.addChild(instruct);
+
+            pane2.x = 400; pane2.y = 200;
+            closeBut.x = 330; closeBut.y = -400;
+            newGame.x = -300; newGame.y = -102;
+            instruct.x = 100; instruct.y = -102;
+            label2.x = -200; label2.y = -300;
+
+            closeBut.alpha = .7;
+            newGame.alpha = .9;
+            instruct.alpha = .9;
+
+
+            closeBut.on("click",function() {pane2.hide();});
+            newGame.on("click", function() {
+                // playGame();
+            })
+            instruct.on("click", function() {pane3.show();});
+
+
+     // Pane for instructions in Settings
+        var pane3 = new Pane({
+            width: 1000,
+            height: 1000,
+            label:"These are the instructions for the game",
+            backgroundColor:"#5C736E",
+            color: white,
+            draggable: true,
+            resets: false,
+            modal:false});
+
+            pane3.addChild(closeBut2);
+            pane3.x = 400; pane3.y = 200;
+
+            closeBut2.x = 330; closeBut2.y = -400;
+            closeBut2.alpha = .7;
+            closeBut2.on("click",function() {pane3.hide();});
+    }
+    function playGame() {
+        // Make labels
+        var points = 3;
+        var pointsLabel = new Label({
+            text: "Points: " + points,
+            color: white,
+            size: 70,
+            backgroundColor: blue,
+            corner: 10,
+            padding: 15
+        }).pos(200, 80, true, null, main);
+
+        var board = new Container(stageW, stageH).addTo(main);
+        var items = ["paperball.png","glue.png","ruler.png","pencil.png"];
+        var currentItem;
+        var showItems = interval(3000, function(e){
+            var item = frame.asset(items[rand(items.length-1)]).clone().sca(0.1).center(board).mov(30, -50);
+            var boom;
+            timeout(1500, function (e) {
+                boom = frame.asset("boom.png")
+                    .sca(0.15)
+                    .rot(-90)
+                    .center(board)
+                    .mov(15,-50)
+                    .alp(0.7)
+                    .bot();
+                currentItem = item.id;
+            });
+            timeout(3000, function (e) {
+                item.removeFrom();
+                boom.removeFrom();
+                currentItem = "";
+                stage.update();
+            });
             stage.update();
         });
-        stage.update();
-    });
 
-    // Throw items on desk to target on the board
-    // Pencil Target
-    var data = [[0,0,0,0,-51.8,118.8,51.8,-118.8],[277.9,-339.3,0,0,-115.1,61.4,115.1,-61.4]];
-    // Glue Target Path
-    var data2 = [[0,0,0,0,45.8,105.1,-45.8,-105.1],[-305.9,-339.3,0,0,68.4,6.7,-68.4,-6.7]];
-    // Ball Target Path
-    var data3 = [[0,0,0,0,64.2,127.2,-64.2,-127.2],[-404.9,-509.6,0,0,105.4,7.4,-105.4,-7.4]];
-    // Ruler Target Path
-    var data4 = [[0,0,0,0,-90.4,127.2,90.4,-127.2],[371.2,-523.3,0,0,-53,84,53,-84]];
+        // Throw items on desk to target on the board
+        // Pencil Target
+        var data = [[0,0,0,0,-51.8,118.8,51.8,-118.8],[277.9,-339.3,0,0,-115.1,61.4,115.1,-61.4]];
+        // Glue Target Path
+        var data2 = [[0,0,0,0,45.8,105.1,-45.8,-105.1],[-305.9,-339.3,0,0,68.4,6.7,-68.4,-6.7]];
+        // Ball Target Path
+        var data3 = [[0,0,0,0,64.2,127.2,-64.2,-127.2],[-404.9,-509.6,0,0,105.4,7.4,-105.4,-7.4]];
+        // Ruler Target Path
+        var data4 = [[0,0,0,0,-90.4,127.2,90.4,-127.2],[371.2,-523.3,0,0,-53,84,53,-84]];
 
-    // PENCIL TARGET
-    // Throw pencil on desk to target on the board
-    var squiggle = new Squiggle({
-        color:black,
-        thickness:1,
-        points:data,
-        showControls:false,
-        interactive:false
-    })
-        .pos(1180,1070, null, null, main)
+        // PENCIL TARGET
+        // Throw pencil on desk to target on the board
+        var squiggle = new Squiggle({
+            color:black,
+            thickness:1,
+            points:data,
+            showControls:false,
+            interactive:false
+        })
+            .pos(1180,1070, null, null, main)
+            .bot();
+        // make pencil aka object thrown at Target
+        pencil = frame.asset("pencil.png")
+            .sca(0.1)
+            .centerReg(main)
+            .rot(180)
+            .loc(squiggle.pointControls[0])
+            .animate({
+                props:{path:squiggle},
+                time:500,
+                ease:"linear",
+                call:function () {
+                    pencil.removeFrom();
+                },
+                startPaused:true
+            });
+       // animate pencil on click
+        pencil.on("mousedown", function () {
+            if (pencil.id !== currentItem) {
+                points--;
+                if (points <= 0) {
+                    points = 0;
+                    goToMiniGame(pointsLabel);
+                }
+                pointsLabel.text = "Points: " + points;
+                stage.update;
+            }
+            pencil.pauseAnimate(false);
+            timeout(1500, function() {
+                pencil.loc(squiggle.pointControls[0]);
+                stage.update();
+            });
+        });
+        ////////////////////////////
+        // GLUE TARGET
+        // Throw glue on desk to target on the board
+        var squiggle2 = new Squiggle({
+            color:black,
+            thickness:1,
+            points:data2,
+            showControls:false,
+            interactive:false
+        })
+        .pos(1770,1070, null, null, main)
         .bot();
-    // make pencil aka object thrown at Target
-    pencil = frame.asset("pencil.png")
-        .sca(0.1)
-        .centerReg(main)
-        .rot(180)
-        .loc(squiggle.pointControls[0])
-        .animate({
-            props:{path:squiggle},
-            time:500,
-            ease:"linear",
-            call:function () {
-                pencil.removeFrom();
-            },
+        // make glue aka object thrown at Target
+        glue = frame.asset("glue.png")
+            .sca(0.1)
+            .centerReg(main)
+            .rot(90)
+            .loc(squiggle2.pointControls[0])
+            .animate({
+                props:{path:squiggle2},
+                time:500,
+                ease:"linear",
+                call:function () {
+                    glue.removeFrom();
+                },
+            startPaused:true
+            });
+        // animate glue on click
+        glue.on("mousedown", function () {
+            if (glue.id !== currentItem) {
+                points--;
+                if (points <= 0) {
+                    points = 0;
+                    goToMiniGame(pointsLabel);
+                }
+                pointsLabel.text = "Points: " + points;
+                stage.update;
+            }
+            glue.pauseAnimate(false);
+            timeout(1500, function() {
+                glue.loc(squiggle2.pointControls[0]);
+                stage.update();
+            });
+        });
+        ////////////////////////////
+        // PAPERBALL TARGET
+        // Throw paperball on desk to target on the board
+        var squiggle3 = new Squiggle({
+            color:black,
+            thickness:1,
+            points:data3,
+            showControls:false,
+            interactive:false
+        })
+            .pos(1900,1250, null, null, main)
+            .bot();
+        // make paperball aka object thrown at Target
+        pball = frame.asset("paperball.png")
+            .sca(0.07)
+            .centerReg(main)
+            .loc(squiggle3.pointControls[0])
+            .animate({
+                props:{path:squiggle3},
+                time:500,
+                ease:"linear",
+                call:function () {
+                    pball.removeFrom();
+                },
             startPaused:true
         });
-   // animate pencil on click
-    pencil.on("mousedown", function () {
-        if (pencil.id !== currentItem) {
-            points--;
-            if (points <= 0) {
-                points = 0;
+        // animate paperball on click
+        pball.on("mousedown", function () {
+            if (pball.id !== currentItem) {
+                points--;
+                if (points <= 0) {
+                    points = 0;
+                    goToMiniGame(pointsLabel);
+                }
+                pointsLabel.text = "Points: " + points;
+                stage.update;
             }
-            pointsLabel.text = "Points: " + points;
-            stage.update;
-        }
-        pencil.pauseAnimate(false);
-        timeout(1500, function() {
-            pencil.loc(squiggle.pointControls[0]);
-            stage.update();
+            pball.pauseAnimate(false);
+            timeout(1500, function() {
+                pball.loc(squiggle3.pointControls[0]);
+                stage.update();
+            });
         });
-    });
-    ////////////////////////////
-    // GLUE TARGET
-    // Throw glue on desk to target on the board
-    var squiggle2 = new Squiggle({
-        color:black,
-        thickness:1,
-        points:data2,
-        showControls:false,
-        interactive:false
-    })
-    .pos(1770,1070, null, null, main)
-    .bot();
-    // make glue aka object thrown at Target
-    glue = frame.asset("glue.png")
-        .sca(0.1)
-        .centerReg(main)
-        .rot(90)
-        .loc(squiggle2.pointControls[0])
-        .animate({
-            props:{path:squiggle2},
-            time:500,
-            ease:"linear",
-            call:function () {
-                glue.removeFrom();
-            },
-        startPaused:true
+        ////////////////////////////
+        // RULER TARGET
+        // Throw paperball on desk to target on the board
+        var squiggle4 = new Squiggle({
+            color:black,
+            thickness:1,
+            points:data4,
+            showControls:false,
+            interactive:false
+        })
+            .pos(1090,1255, null, null, main)
+            .bot();
+        // make ruler aka object thrown at Target
+        ruler = frame.asset("ruler.png")
+            .sca(0.1)
+            .centerReg(main)
+            .loc(squiggle4.pointControls[0])
+            .animate({
+                props:{path:squiggle4},
+                time:500,
+                ease:"linear",
+                call:function () {
+                    ruler.removeFrom();
+                },
+            startPaused:true
         });
-    // animate glue on click
-    glue.on("mousedown", function () {
-        if (pencil.id !== currentItem) {
-            points--;
-            if (points <= 0) {
-                points = 0;
+        // animate ruler on click
+        ruler.on("mousedown", function () {
+            if (ruler.id !== currentItem) {
+                points--;
+                if (points <= 0) {
+                    points = 0;
+                    goToMiniGame(pointsLabel);
+                }
+                pointsLabel.text = "Points: " + points;
+                stage.update;
             }
-            pointsLabel.text = "Points: " + points;
-            stage.update;
-        }
-        glue.pauseAnimate(false);
-        timeout(1500, function() {
-            glue.loc(squiggle2.pointControls[0]);
-            stage.update();
+            ruler.pauseAnimate(false);
+            timeout(1500, function() {
+                ruler.loc(squiggle4.pointControls[0]);
+                stage.update();
+            });
         });
-    });
-    ////////////////////////////
-    // PAPERBALL TARGET
-    // Throw paperball on desk to target on the board
-    var squiggle3 = new Squiggle({
-        color:black,
-        thickness:1,
-        points:data3,
-        showControls:false,
-        interactive:false
-    })
-        .pos(1900,1250, null, null, main)
-        .bot();
-    // make paperball aka object thrown at Target
-    pball = frame.asset("paperball.png")
-        .sca(0.07)
-        .centerReg(main)
-        .loc(squiggle3.pointControls[0])
-        .animate({
-            props:{path:squiggle3},
-            time:500,
-            ease:"linear",
-            call:function () {
-                pball.removeFrom();
-            },
-        startPaused:true
-    });
-    // animate paperball on click
-    pball.on("mousedown", function () {
-        if (pencil.id !== currentItem) {
-            points--;
-            if (points <= 0) {
-                points = 0;
-            }
-            pointsLabel.text = "Points: " + points;
-            stage.update;
+            // pointsLabel.background.color = red;
+        function goToMiniGame(pointsLabel) {
+            pointsLabel.background.color = red;
+            timeout(1000, function() {
+                pages.go(detention, "right");
+                makeMiniGame();
+            })
         }
-        pball.pauseAnimate(false);
-        timeout(1500, function() {
-            pball.loc(squiggle3.pointControls[0]);
-            stage.update();
-        });
-    });
-    ////////////////////////////
-    // RULER TARGET
-    // Throw paperball on desk to target on the board
-    var squiggle4 = new Squiggle({
-        color:black,
-        thickness:1,
-        points:data4,
-        showControls:false,
-        interactive:false
-    })
-        .pos(1090,1255, null, null, main)
-        .bot();
-    // make ruler aka object thrown at Target
-    ruler = frame.asset("ruler.png")
-        .sca(0.1)
-        .centerReg(main)
-        .loc(squiggle4.pointControls[0])
-        .animate({
-            props:{path:squiggle4},
-            time:500,
-            ease:"linear",
-            call:function () {
-                ruler.removeFrom();
-            },
-        startPaused:true
-    });
-    // animate ruler on click
-    ruler.on("mousedown", function () {
-        if (pencil.id !== currentItem) {
-            points--;
-            if (points <= 0) {
-                points = 0;
-            }
-            pointsLabel.text = "Points: " + points;
-            stage.update;
-        }
-        ruler.pauseAnimate(false);
-        timeout(1500, function() {
-            ruler.loc(squiggle4.pointControls[0]);
-            stage.update();
-        });
-    });
-
-    var checkMiniGameBtn = new Button().pos(100, 100, true, true, main);
-    checkMiniGameBtn.on("click", function() {
-        pages.go(detention, "right");
-        makeMiniGame();
-    })
+    }
 
     // MINI GAME
     function makeMiniGame() {
-        frame.asset("board.png").sca(2.1).center(detention);
-        var miniGameResult = new Label("", 150, null, "#FFFFB6").center(detention).mov(null, -200);
+        var miniGameResult = new Label({
+            text: "",
+            size: 100,
+            color: "#FFFFB6",
+            align: "center"
+        }).center(detention).mov(null, -200);
         var num1 = rand(1,10);
         var num2 = rand(1,10);
         var equation = num1 + "   +   " + num2 + "   =   ";
@@ -333,12 +414,17 @@ frame.on("ready", function() {
 
         button.on("click", function () {
             if (userAns.text == ans){
-                zog("Correct! Nice job!")
-                var title = "Correct! Nice job!";
+                var title = "Correct! Back to the main game!";
                 miniGameResult.text = title;
+                points = 3;
+                timeout(1500, function() {
+                    pages.go(main, "left");
+                    makeMiniGame();
+                    detention.removeFrom();
+                })
                 stage.update();
             } else {
-                var title = "Try Again";
+                var title = "Try again!";
                 miniGameResult.text = title;
                 stage.update();
             };
