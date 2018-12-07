@@ -11,6 +11,8 @@
 
 <script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1_min.js"></script>
 <script src="https://d309knd7es5f10.cloudfront.net/zim_9.2.1.js"></script>
+<script src="https://d309knd7es5f10.cloudfront.net/pizzazz_01.js"></script>
+<script src="https://d309knd7es5f10.cloudfront.net/pizzazz_02.js"></script>
 <!-- use zimjs.com/distill for minified individual functions! -->
 
 <script>
@@ -27,7 +29,7 @@ var width = 2917;
 var height = 1564;
 var color = light; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png", "board.png"];
+var assets = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png", "board.png", "logo.png"];
 var path = "assets/";
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter());
 frame.on("ready", function() {
@@ -40,23 +42,46 @@ frame.on("ready", function() {
     // see http://zimjs.com/learn.html for video and code tutorials
     // see http://zimjs.com/docs.html for documentation
     // see http://zimjs.com/bits.html for 64 Interactive Media techniques
-    
+
     var main = new Container(stageW, stageH);
     var detention = new Container(stageW, stageH);
+    var intro = new Container(stageW, stageH);
 
     var pages = new Pages({
         holder: stage,
         pages: [
             // swipe:["right", "left", "down", "up"]
-            {page: main, swipe: [null,detention,null,null]},
+            {page: main, swipe: [null,detention,null,intro]},
             {page: detention, swipe: [main,null,null,null]},
+            {page: intro, swipe: [null,null,main,null]},
         ],
         transition: "slide",
         speed: 500
 	}).addTo(stage);
 
-    frame.asset("classroom.png").addTo(main);
+    var logo = frame.asset("logo.png").addTo(intro);
 
+    var introBtn = new Button().pos(100,100);
+    introBtn.on("click", function() {
+        pages.go(intro, "up");
+    })
+
+
+
+    frame.asset("classroom.png").addTo(main);
+    var icon = pizzazz.makeIcon("settings", "white");
+    var settings = new Button({
+        width:70,
+        color:white,
+        backgroundColor:dark,
+        rollBackgroundColor:tin,
+        corner:0,
+        gradient:0.1,
+        gloss:0.1,
+        icon:icon,
+    })
+    .center(main)
+    .mov(210,null);
     // Make labels
     var points = 3;
     var pointsLabel = new Label({
@@ -210,7 +235,6 @@ frame.on("ready", function() {
             props:{path:squiggle3},
             time:500,
             ease:"linear",
-            orient: false,
             call:function () {
                 pball.removeFrom();
             },
@@ -293,9 +317,9 @@ frame.on("ready", function() {
         // new Label(ans).pos(750,450)
 
         var userAns = new TextArea({
-            width: 150, 
-            height: 150, 
-            size: 150, 
+            width: 150,
+            height: 150,
+            size: 150,
             color:"#FFFFB6"
         }).center(detention).mov(-100, 200);
         userAns.on("input", function() {
@@ -320,7 +344,7 @@ frame.on("ready", function() {
             };
         })
     }
-    
+
 
     // record points
     // new TransformManager(squiggle3);
