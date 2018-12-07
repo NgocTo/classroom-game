@@ -1,0 +1,371 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ZIM Frame - Fit Template</title>
+
+<!-- Welcome to ZIM at https://zimjs.com - Code Creativity!              	        -->
+<!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS https://createjs.com -->
+<!-- Founded by Inventor Dan Zen - http://danzen.com - Canadian New Media Award Winner 	-->
+<!-- ZIM is free to use. You can donate to help improve ZIM at http://zimjs.com/donate 	-->
+
+<script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1_min.js"></script>
+<script src="https://d309knd7es5f10.cloudfront.net/zim_9.2.1.js"></script>
+<!-- use zimjs.com/distill for minified individual functions! -->
+
+<script>
+
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"	sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"	sets canvas and stage to dimensions and scales to fit outside window size
+// "full"	sets stage to window size with no scaling
+// "tagID"	add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+
+var scaling = "fit"; // this will resize to fit inside the screen dimensions
+var width = 2917;
+var height = 1564;
+var color = "#5C736E"; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
+var outerColor = "#5C736E"; // any HTML colors like "violet", "#333", etc. fine to use
+var assets = ["logo.png","paperball.png","glue.png","ruler.png","pencil.png","boom.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png"];
+var path = "assets/";
+var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter());
+frame.on("ready", function() {
+    zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
+
+    var stage = frame.stage;
+    var stageW = frame.width;
+    var stageH = frame.height;
+
+    // see http://zimjs.com/learn.html for video and code tutorials
+    // see http://zimjs.com/docs.html for documentation
+    // see http://zimjs.com/bits.html for 64 Interactive Media techniques
+    intro();
+    function intro(){
+
+     var logo = frame.asset("logo.png")
+        .addTo()
+		.center();
+
+        //show button "play" -will show player instructions
+        var showButton = new Button({
+                width:500,
+                height:100,
+                backgroundColor:"#FFFFB6",
+				rollBackgroundColor:"#DDAC40",
+                color:"#5C736E" ,
+				label:"Play",
+				corner:6
+			})
+				.addTo(stage)
+                .center()
+                .mov(0, 350);
+            showButton.on("click", function() {
+                showButton.removeFrom();
+                logo.removeFrom();
+                showInstruction();
+                });
+
+    function showInstruction(){
+       var board =  frame.asset("logo.png")
+            .addTo()
+            .center()
+
+         var text = new Label({
+				text:"Instructions",
+				color:"white",
+                size:100
+			})
+				.center()
+				.mov(0, -250);
+
+        //playButton will take players to game
+		var playButton = new Button({
+		    width:500,
+            height:100,
+            backgroundColor:"#FFFFB6",
+			rollBackgroundColor:"#DDAC40",
+            color:"#5C736E" ,
+			label:"Let's Play",
+			corner:6
+			})
+			.addTo(stage)
+            .center()
+            .mov(0,500)
+
+        playButton.on("click", function() {
+			playGame();
+		})
+
+    }
+}
+    function playGame(){
+        frame.asset("classroom.png").addTo();
+    // Make labels
+    var points = 3;
+    new Label({
+        text: "Points: " + points,
+        color: white,
+        size: 70,
+        backgroundColor: blue,
+        corner: 10,
+        padding: 15
+    }).pos(50, 50);
+
+    var board = new Container(stageW, stageH).addTo();
+    var items = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png"];
+    var showItems = interval(3000, function(e){
+        var item = frame.asset(items[rand(items.length-1)]).clone().sca(0.1).center(board).mov(null, -50);
+        var boom;
+        timeout(1500, function (e) {
+            boom = frame.asset("boom.png")
+                .sca(0.1)
+                .center()
+                .mov(null,-50);
+            // loop(items, function(itm, i) {
+            //     itm.on("click", function(e) {
+            //         zog("clicking");
+            //     })
+            // })
+        });
+        timeout(3000, function (e) {
+            item.removeFrom();
+            boom.removeFrom();
+            stage.update();
+        });
+        stage.update();
+    });
+
+    // Throw items on desk to target on the board
+    // Pencil Target
+    var data = [[0,0,0,0,-51.8,118.8,51.8,-118.8],[277.9,-339.3,0,0,-115.1,61.4,115.1,-61.4]];
+    // Glue Target Path
+    var data2 = [[0,0,0,0,45.8,105.1,-45.8,-105.1],[-305.9,-339.3,0,0,68.4,6.7,-68.4,-6.7]];
+    // Ball Target Path
+    var data3 = [[0,0,0,0,64.2,127.2,-64.2,-127.2],[-285.7,-523.3,0,0,29.8,50.9,-29.8,-50.9]];
+    // Ruler Target Path
+    var data4 = [[0,0,0,0,-90.4,127.2,90.4,-127.2],[371.2,-523.3,0,0,-53,84,53,-84]];
+
+    // PENCIL TARGET
+    // Throw pencil on desk to target on the board
+    var squiggle = new Squiggle({
+        color:black,
+        thickness:1,
+        points:data,
+        showControls:false,
+        interactive:false
+    })
+        .pos(1180,1070)
+        .bot();
+    // make pencil aka object thrown at Target
+    pencil = frame.asset("pencil.png")
+        .sca(0.1)
+        .centerReg()
+        .rot(180)
+        .loc(squiggle.pointControls[0])
+        .animate({
+            props:{path:squiggle},
+            time:500,
+            ease:"linear",
+            call:function () {
+                pencil.removeFrom();
+            },
+            startPaused:true
+        });
+   // animate pencil on click
+    pencil.on("mousedown", function () {
+        pencil.pauseAnimate(false);
+        timeout(2000, function() {
+            pencil.loc(squiggle.pointControls[0]);
+            stage.update();
+        })
+    });
+    ////////////////////////////
+    // GLUE TARGET
+    // Throw glue on desk to target on the board
+    var squiggle2 = new Squiggle({
+        color:black,
+        thickness:1,
+        points:data2,
+        showControls:false,
+        interactive:false
+    })
+    .pos(1770,1070)
+    .bot();
+    // make glue aka object thrown at Target
+    glue = frame.asset("glue.png")
+        .sca(0.1)
+        .centerReg()
+        .rot(90)
+        .loc(squiggle2.pointObjects[0])
+        .animate({
+            props:{path:squiggle2},
+            time:500,
+            ease:"linear",
+            call:function () {
+                glue.removeFrom();
+            },
+        startPaused:true
+        });
+    // animate glue on click
+    glue.on("mousedown", function () {
+        glue.pauseAnimate(false);
+    });
+    ////////////////////////////
+    // PAPERBALL TARGET
+    // Throw paperball on desk to target on the board
+    var squiggle3 = new Squiggle({
+        color:black,
+        thickness:1,
+        points:data3,
+        showControls:false,
+        interactive:false
+    })
+        .pos(1750,1255)
+        .bot();
+    // make paperball aka object thrown at Target
+    pball = frame.asset("paperball.png")
+        .sca(0.1)
+        .centerReg()
+        .loc(squiggle3.pointObjects[0])
+        .animate({
+            props:{path:squiggle3},
+            time:500,
+            ease:"linear",
+            call:function () {
+                pball.removeFrom();
+            },
+        startPaused:true
+    });
+    // animate paperball on click
+    pball.on("mousedown", function () {
+        pball.pauseAnimate(false);
+    });
+    ////////////////////////////
+    // RULER TARGET
+    // Throw paperball on desk to target on the board
+    var squiggle4 = new Squiggle({
+        color:black,
+        thickness:1,
+        points:data4,
+        showControls:false,
+        interactive:false
+    })
+        .pos(1090,1255)
+        .bot();
+    // make ruler aka object thrown at Target
+    ruler = frame.asset("ruler.png")
+        .sca(0.1)
+        .centerReg()
+        .loc(squiggle4.pointObjects[0])
+        .animate({
+            props:{path:squiggle4},
+            time:500,
+            ease:"linear",
+            call:function () {
+                ruler.removeFrom();
+            },
+        startPaused:true
+    });
+    // animate ruler on click
+    ruler.on("mousedown", function () {
+        ruler.pauseAnimate(false);
+    });
+
+    //record points
+    new TransformManager(squiggle);
+    frame.on("keydown", function (e) {
+        zog(e.keyCode);
+        if (e.keyCode == 82) {
+            squiggle.recordPoints(true);
+        }
+    });
+
+    //SETTINGS FEATURE
+    var showBut = new Button({
+      width:150,
+            height:100,
+            backgroundColor:"yellow",
+            rollBackgroundColor:"#DDAC40",
+            color:"#5C736E" ,
+            label:"Settings",
+            corner:6
+    })
+      .addTo(stage)
+      .center()
+      .mov(400, -360);
+      showBut.on("click", function() {pane2.show();});
+
+
+    var closeBut = new Button(41,41,"X","black","#444","white","2",5);
+    var closeBut2 = new Button(41,41,"X","black","#444","white","2",5);
+    var newGame = new Button(250,170,"New Game","orange","yellow","black","6",10);
+    var instruct = new Button(250,170,"Instructions","orange","yellow","black","6",10);
+    var label2 = new Label({text:"OPTIONS", size:100,font:null,color:"white",fontOptions:"bold"});
+
+
+    var pane2 = new Pane({
+      width: 1000,
+      height: 1000,
+      label:label2,
+      backgroundColor:"#5C736E",
+      resets: false,
+      modal:false});
+
+      pane2.addChild(closeBut);
+      pane2.addChild(newGame);
+      pane2.addChild(instruct);
+
+      pane2.x = 400; pane2.y = 200;
+      closeBut.x = 330; closeBut.y = -400;
+      newGame.x = -300; newGame.y = -102;
+      instruct.x = 100; instruct.y = -102;
+      label2.x = -200; label2.y = -300;
+
+      closeBut.alpha = .7;
+      newGame.alpha = .9;
+      instruct.alpha = .9;
+
+
+      closeBut.on("click",function() {pane2.hide();});
+      newGame.on("click", function() {
+      playGame();
+    })
+      instruct.on("click", function() {pane3.show();});
+
+
+  // Pane for instructions in Settings
+      var pane3 = new Pane({
+          width: 1000,
+          height: 1000,
+          label:"These are the instructions for the game",
+          backgroundColor:"#5C736E",
+          draggable: true,
+          resets: false,
+          modal:false});
+
+          pane3.addChild(closeBut2);
+          pane3.x = 400; pane3.y = 200;
+
+
+
+
+          closeBut2.x = 330; closeBut2.y = -400;
+          closeBut2.alpha = .7;
+          closeBut2.on("click",function() {pane3.hide();});
+
+}
+    stage.update(); // this is needed to show any changes
+
+}); // end of ready
+
+</script>
+
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+</head>
+
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+</body>
+</html> -->
