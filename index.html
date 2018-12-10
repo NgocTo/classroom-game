@@ -45,6 +45,8 @@ frame.on("ready", function() {
     // see http://zimjs.com/docs.html for documentation
     // see http://zimjs.com/bits.html for 64 Interactive Media techniques
 
+    var pointsLabel;
+    var points = 3;
     var main = new Container(stageW, stageH);
     var detention = new Container(stageW, stageH);
     var intro = new Container(stageW, stageH);
@@ -161,11 +163,9 @@ frame.on("ready", function() {
         closeBut2.alpha = .7;
         closeBut2.on("click",function() {pane3.hide();});
     }
-
     function playGame() {
         // Make labels
-        var points = 3;
-        var pointsLabel = new Label({
+        pointsLabel = new Label({
             text: "Points: " + points,
             color: white,
             size: 70,
@@ -434,11 +434,14 @@ frame.on("ready", function() {
             rows: 1
         })
             .centerReg(main)
+            .alp(0.5)
             .loc(spritePath.pointControls[0])
             .animate({
-                props: {path:spritePath},
+                props: {path:spritePath, flip: true},
                 time: 20000,
-                ease: "linear"
+                ease: "linear",
+                rewind: true,
+                loop: true
             });
         dyno.run({time: 5000, loop: true});
 
@@ -451,7 +454,6 @@ frame.on("ready", function() {
             })
         }
     }
-
     // MINI GAME
     function makeMiniGame() {
         var resultText = "";
@@ -463,10 +465,14 @@ frame.on("ready", function() {
         }).center(detention).mov(null, -200);
         var num1 = rand(1,10);
         var num2 = rand(1,10);
-        var equation = "";
-        equation = num1 + "   +   " + num2 + "   =   ";
-        var index = new Label(equation + "?", 150, null, "#FFFFB6" ).center(detention);
-        var ans= num1 + num2;
+        var equation = num1 + "   +   " + num2 + "   =   ";
+        var index = new Label({
+            text: equation + "?", 
+            size: 150,  
+            color: "#FFFFB6"
+        })
+            .center(detention);
+        var ans = num1 + num2;
         // new Label(ans).pos(750,450)
 
         // var userAns = new TextArea({
@@ -483,7 +489,7 @@ frame.on("ready", function() {
             color: "#5C736E"}).center(detention).mov(-150, 200);
 
         userAns.on("change", function() {
-            index.currentValue = equation + userAns.text;
+            index.text = equation + userAns.currentValue;
             stage.update();
         });
         var button = new Button(75, 75, "GO","#FFFFB6","#DDAC40","#5C736E" )
@@ -497,12 +503,15 @@ frame.on("ready", function() {
                 var title = "Correct! Back to the main game!";
                 miniGameResult.text = title;
                 points = 3;
-                pointsLabel.text = points;
+                pointsLabel.text = "Points: " + points;
                 timeout(1000, function() {
-                    makeMiniGame();
+                    equation = "";
+                    index.text = "";
+                    miniGameResult.text = "";
+                    userAns.removeFrom();
+                    button.removeFrom();
+                    index.removeFrom;
                     pages.go(main, "left");
-                    index.removeFrom();
-                    miniGameResult.removeFrom();
                 })
                 stage.update();
             } else {
@@ -524,11 +533,6 @@ frame.on("ready", function() {
     //         spritePath.recordPoints(true);
     //     }
     // });
-    // var spriteData = [[0,0,0,0,-30,0,30,0],[75,60,0,0,-30,0,30,0],[150,0,0,0,-30,0,30,0],[225,60,0,0,-30,0,30,0],[300,0,0,0,-30,0,30,0]];
-        
-        // var spritePath = new Squiggle({
-            // points: spriteData
-        // }).center(main);
     stage.update(); // this is needed to show any changes
 
 }); // end of ready
