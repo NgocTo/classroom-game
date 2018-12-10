@@ -30,7 +30,7 @@ var width = 2917;
 var height = 1564;
 var color = light; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["paperball.png","glue.png","ruler.png","pencil.png","green.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png", "board.png", "logo.png",
+var assets = ["dyno.png","paperball.png","glue.png","ruler.png","pencil.png","green.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png", "board.png", "logo.png", 
             "sling.mp3", "correct.wav", "gameloop.mp3"];
 var path = "assets/";
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter());
@@ -65,7 +65,7 @@ frame.on("ready", function() {
     makeIntro();
     function makeIntro() {
         //button to begin the game
-        frame.asset("gameloop.mp3").play();
+        frame.asset("gameloop.mp3").play({loop: true, volume:.2});
         var playButton = new Button({
             width:300,
             height:60,
@@ -256,7 +256,7 @@ frame.on("ready", function() {
             });
             if (pencil.id == currentItem) {
                 timeout(500, function() {
-                    frame.asset("correct.wav").play();
+                    frame.asset("correct.wav").play({volume:.8});
                 })
             }
         });
@@ -309,7 +309,7 @@ frame.on("ready", function() {
             });
             if (glue.id == currentItem) {
                 timeout(500, function() {
-                    frame.asset("correct.wav").play();
+                    frame.asset("correct.wav").play({volume:.8});
                 })
             }
         });
@@ -361,7 +361,7 @@ frame.on("ready", function() {
             });
             if (pball.id == currentItem) {
                 timeout(500, function() {
-                    frame.asset("correct.wav").play();
+                    frame.asset("correct.wav").play({volume:.8});
                 })
             }
         });
@@ -413,10 +413,35 @@ frame.on("ready", function() {
             });
             if (ruler.id == currentItem) {
                 timeout(500, function() {
-                    frame.asset("correct.wav").play();
+                    frame.asset("correct.wav").play({volume:.8});
                 })
             }
         });
+
+        // ANIMATE SPRITE
+        var spriteData = [
+            [-120.8,29.7,0,0,-30,0,30,0],
+            [1968.9,41.6,0,0,-30,0,30,0]];
+        var spritePath = new Squiggle({
+            points: spriteData,
+            showControls:false,
+            interactive:false
+        }).center(main).mov(-750, 750).bot();
+        var sprite = frame.asset("dyno.png");
+        var dyno = new Sprite({
+            image: sprite,
+            cols: 24,
+            rows: 1
+        })
+            .centerReg(main)
+            .loc(spritePath.pointControls[0])
+            .animate({
+                props: {path:spritePath},
+                time: 20000,
+                ease: "linear"
+            });
+        dyno.run({time: 5000, loop: true});
+
             // pointsLabel.background.color = red;
         function goToMiniGame(pointsLabel) {
             pointsLabel.background.color = red;
@@ -468,15 +493,16 @@ frame.on("ready", function() {
 
         button.on("click", function () {
             if (userAns.currentValue == ans){
-                frame.asset("correct.wav").play();
+                frame.asset("correct.wav").play({volume:.8});
                 var title = "Correct! Back to the main game!";
                 miniGameResult.text = title;
                 points = 3;
                 pointsLabel.text = points;
-                timeout(1500, function() {
-                    pages.go(main, "left");
+                timeout(1000, function() {
                     makeMiniGame();
-                    detention.removeFrom();
+                    pages.go(main, "left");
+                    index.removeFrom();
+                    miniGameResult.removeFrom();
                 })
                 stage.update();
             } else {
@@ -491,14 +517,18 @@ frame.on("ready", function() {
     });
 
     // record points
-    // new TransformManager(squiggle3);
+    // new TransformManager(spritePath);
     // frame.on("keydown", function (e) {
     //     zog(e.keyCode);
     //     if (e.keyCode == 82) {
-    //         squiggle3.recordPoints(true);
+    //         spritePath.recordPoints(true);
     //     }
     // });
-
+    // var spriteData = [[0,0,0,0,-30,0,30,0],[75,60,0,0,-30,0,30,0],[150,0,0,0,-30,0,30,0],[225,60,0,0,-30,0,30,0],[300,0,0,0,-30,0,30,0]];
+        
+        // var spritePath = new Squiggle({
+            // points: spriteData
+        // }).center(main);
     stage.update(); // this is needed to show any changes
 
 }); // end of ready
