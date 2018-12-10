@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Detention - 101</title>
+<title>DETENTION 101</title>
 
 <!-- Welcome to ZIM at https://zimjs.com - Code Creativity!              	        -->
 <!-- ZIM runs on the HTML Canvas powered by JavaScript and CreateJS https://createjs.com -->
@@ -11,6 +11,7 @@
 
 <script src="https://d309knd7es5f10.cloudfront.net/createjs_1.1_min.js"></script>
 <script src="https://d309knd7es5f10.cloudfront.net/zim_9.2.1.js"></script>
+<!-- <script src="https://zimjs.com/live/zim_9.3.0_doc_focus.js"></script> -->
 <script src="https://d309knd7es5f10.cloudfront.net/pizzazz_01.js"></script>
 <script src="https://d309knd7es5f10.cloudfront.net/pizzazz_02.js"></script>
 <!-- use zimjs.com/distill for minified individual functions! -->
@@ -29,7 +30,8 @@ var width = 2917;
 var height = 1564;
 var color = light; // ZIM colors like green, blue, pink, faint, clear, etc. available globally
 var outerColor = dark; // any HTML colors like "violet", "#333", etc. fine to use
-var assets = ["paperball.png","glue.png","ruler.png","pencil.png","boom.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png", "board.png", "logo.png"];
+var assets = ["paperball.png","glue.png","ruler.png","pencil.png","green.png","student-01.png","student-02.png","student-03.png","student-04.png","classroom.png", "board.png", "logo.png",
+            "sling.mp3", "correct.wav", "gameloop.mp3"];
 var path = "assets/";
 var frame = new Frame(scaling, width, height, color, outerColor, assets, path, new Waiter());
 frame.on("ready", function() {
@@ -63,22 +65,23 @@ frame.on("ready", function() {
     makeIntro();
     function makeIntro() {
         //button to begin the game
+        frame.asset("gameloop.mp3").play();
         var playButton = new Button({
-            width:500,
-            height:100,
+            width:300,
+            height:60,
             backgroundColor:"#FFFFB6",
             rollBackgroundColor:"#DDAC40",
             color:"#5C736E" ,
             label:"Let's Play",
             corner:6
         })
-            .addTo(intro)
-            .center()
-            .mov(0,300)
+            .sca(2)
+            .center(intro)
+            .mov(0,350)
         playButton.on("click", function() {
-           pages.go(main, "down");
-           playGame();
-           makeSettings();
+            pages.go(main, "down");
+            playGame();
+            makeSettings();
         })
     }
     function makeSettings() {
@@ -88,21 +91,21 @@ frame.on("ready", function() {
             color:white,
             backgroundColor:blue,
             rollBackgroundColor:tin,
-            corner:0,
+            corner:10,
             icon:icon,
             shadowColor: -1
         })
-           .sca(1.55)
-           .center(main)
-           .mov(1350,-650);
+           .sca(1.65)
+           .pos(50, 80, true, null, main)
+           // .center(main)
+           // .mov(1350,-650);
         settings.on("click",function(){pane2.show();})
 
         var closeBut = new Button(41,41,"X","black","#444","white","2",5);
         var closeBut2 = new Button(41,41,"X","black","#444","white","2",5);
-        var newGame = new Button(250,170,"New Game","#FFFFB6","#DDAC40","#5C736E");
-        var instruct = new Button(250,170,"Instructions","#FFFFB6","#DDAC40","#5C736E");
+        var newGame = new Button(250,170,new Label({text: "New Game", size: 42, color: "#5C736E"}),"#FFFFB6","#DDAC40","#5C736E");
+        var instruct = new Button(250,170,new Label({text: "Instructions", size: 42, color: "#5C736E"}),"#FFFFB6","#DDAC40","#5C736E");
         var label2 = new Label({text:"OPTIONS", size:100,font:null,color:"white",fontOptions:"bold"});
-
 
         var pane2 = new Pane({
             width: 1000,
@@ -110,48 +113,55 @@ frame.on("ready", function() {
             label:label2,
             backgroundColor:"#5C736E",
             resets: false,
-            modal:false});
+            modal: true
+        });
 
-            pane2.addChild(closeBut);
-            pane2.addChild(newGame);
-            pane2.addChild(instruct);
+        pane2.addChild(closeBut);
+        pane2.addChild(newGame);
+        pane2.addChild(instruct);
 
-            pane2.x = 400; pane2.y = 200;
-            closeBut.x = 330; closeBut.y = -400;
-            newGame.x = -300; newGame.y = -102;
-            instruct.x = 100; instruct.y = -102;
-            label2.x = -200; label2.y = -300;
+        pane2.x = 400; pane2.y = 200;
+        closeBut.x = 330; closeBut.y = -400;
+        newGame.x = -300; newGame.y = -102;
+        instruct.x = 100; instruct.y = -102;
+        label2.x = -200; label2.y = -300;
 
-            closeBut.alpha = .7;
-            newGame.alpha = .9;
-            instruct.alpha = .9;
-
-
-            closeBut.on("click",function() {pane2.hide();});
-            newGame.on("click", function() {
-                // playGame();
-            })
-            instruct.on("click", function() {pane3.show();});
+        closeBut.alpha = .7;
+        newGame.alpha = .9;
+        instruct.alpha = .9;
 
 
-     // Pane for instructions in Settings
+        closeBut.on("click",function() {pane2.hide();});
+        newGame.on("click", function() {
+            // playGame();
+        })
+        instruct.on("click", function() {pane3.show();});
+
+    // Pane for instructions in Settings
+        var instructionLabel = new Label({
+            text: " Point your mouse cursor to the 4 objects \n (pencil, paperball, ruler, or glue) on their desk \n to aim at the red target with the object \n needed to select. \n Miss the red target and you lose a point. \n If you reach 0 points, you will be directed \n to a mini game to solve a math equation \n in order to start a new game",
+            color: white,
+            size: 42,
+            lineHeight: 70,
+            align: "center"
+        })
         var pane3 = new Pane({
             width: 1000,
             height: 1000,
-            label:"These are the instructions for the game",
+            label:instructionLabel,
             backgroundColor:"#5C736E",
             color: white,
-            draggable: true,
             resets: false,
-            modal:false});
+            modal: true
+        });
+        pane3.addChild(closeBut2);
+        pane3.x = 400; pane3.y = 200;
 
-            pane3.addChild(closeBut2);
-            pane3.x = 400; pane3.y = 200;
-
-            closeBut2.x = 330; closeBut2.y = -400;
-            closeBut2.alpha = .7;
-            closeBut2.on("click",function() {pane3.hide();});
+        closeBut2.x = 330; closeBut2.y = -400;
+        closeBut2.alpha = .7;
+        closeBut2.on("click",function() {pane3.hide();});
     }
+
     function playGame() {
         // Make labels
         var points = 3;
@@ -169,20 +179,19 @@ frame.on("ready", function() {
         var currentItem;
         var showItems = interval(3000, function(e){
             var item = frame.asset(items[rand(items.length-1)]).clone().sca(0.1).center(board).mov(30, -50);
-            var boom;
+            var green;
             timeout(1500, function (e) {
-                boom = frame.asset("boom.png")
-                    .sca(0.15)
-                    .rot(-90)
+                green = frame.asset("green.png")
+                    .sca(0.1)
                     .center(board)
-                    .mov(15,-50)
+                    .mov(25,-50)
                     .alp(0.7)
                     .bot();
                 currentItem = item.id;
             });
             timeout(3000, function (e) {
                 item.removeFrom();
-                boom.removeFrom();
+                green.removeFrom();
                 currentItem = "";
                 stage.update();
             });
@@ -217,16 +226,20 @@ frame.on("ready", function() {
             .rot(180)
             .loc(squiggle.pointControls[0])
             .animate({
+                set:{percentComplete: 0},
                 props:{path:squiggle},
                 time:500,
+                loop:true,
                 ease:"linear",
-                call:function () {
+                loopCall:function () {
                     pencil.removeFrom();
+                    pencil.pauseAnimate();
                 },
                 startPaused:true
             });
        // animate pencil on click
         pencil.on("mousedown", function () {
+            frame.asset("sling.mp3").play();
             if (pencil.id !== currentItem) {
                 points--;
                 if (points <= 0) {
@@ -238,9 +251,14 @@ frame.on("ready", function() {
             }
             pencil.pauseAnimate(false);
             timeout(1500, function() {
-                pencil.loc(squiggle.pointControls[0]);
+                pencil.loc(squiggle.pointControls[0], null, main);
                 stage.update();
             });
+            if (pencil.id == currentItem) {
+                timeout(500, function() {
+                    frame.asset("correct.wav").play();
+                })
+            }
         });
         ////////////////////////////
         // GLUE TARGET
@@ -260,17 +278,21 @@ frame.on("ready", function() {
             .centerReg(main)
             .rot(90)
             .loc(squiggle2.pointControls[0])
-            .animate({
+            .animate(
+                {set:{percentComplete: 0},
                 props:{path:squiggle2},
                 time:500,
+                loop:true,
                 ease:"linear",
-                call:function () {
+                loopCall:function () {
                     glue.removeFrom();
+                    glue.pauseAnimate();
                 },
             startPaused:true
             });
         // animate glue on click
         glue.on("mousedown", function () {
+            frame.asset("sling.mp3").play();
             if (glue.id !== currentItem) {
                 points--;
                 if (points <= 0) {
@@ -282,9 +304,14 @@ frame.on("ready", function() {
             }
             glue.pauseAnimate(false);
             timeout(1500, function() {
-                glue.loc(squiggle2.pointControls[0]);
+                glue.loc(squiggle2.pointControls[0], null, main);
                 stage.update();
             });
+            if (glue.id == currentItem) {
+                timeout(500, function() {
+                    frame.asset("correct.wav").play();
+                })
+            }
         });
         ////////////////////////////
         // PAPERBALL TARGET
@@ -304,16 +331,20 @@ frame.on("ready", function() {
             .centerReg(main)
             .loc(squiggle3.pointControls[0])
             .animate({
+                set:{percentComplete: 0},
                 props:{path:squiggle3},
                 time:500,
+                loop: true,
                 ease:"linear",
-                call:function () {
+                loopCall:function () {
                     pball.removeFrom();
+                    pball.pauseAnimate();
                 },
             startPaused:true
         });
         // animate paperball on click
         pball.on("mousedown", function () {
+            frame.asset("sling.mp3").play();
             if (pball.id !== currentItem) {
                 points--;
                 if (points <= 0) {
@@ -325,9 +356,14 @@ frame.on("ready", function() {
             }
             pball.pauseAnimate(false);
             timeout(1500, function() {
-                pball.loc(squiggle3.pointControls[0]);
+                pball.loc(squiggle3.pointControls[0], null, main);
                 stage.update();
             });
+            if (pball.id == currentItem) {
+                timeout(500, function() {
+                    frame.asset("correct.wav").play();
+                })
+            }
         });
         ////////////////////////////
         // RULER TARGET
@@ -347,16 +383,20 @@ frame.on("ready", function() {
             .centerReg(main)
             .loc(squiggle4.pointControls[0])
             .animate({
+                // set:{percentComplete: 0},
                 props:{path:squiggle4},
                 time:500,
+                loop:true,
                 ease:"linear",
-                call:function () {
+                loopCall:function () {
                     ruler.removeFrom();
+                    ruler.pauseAnimate();
                 },
             startPaused:true
         });
         // animate ruler on click
         ruler.on("mousedown", function () {
+            frame.asset("sling.mp3").play();
             if (ruler.id !== currentItem) {
                 points--;
                 if (points <= 0) {
@@ -367,56 +407,72 @@ frame.on("ready", function() {
                 stage.update;
             }
             ruler.pauseAnimate(false);
-            timeout(1500, function() {
-                ruler.loc(squiggle4.pointControls[0]);
+            ruler.timer = timeout(1500, function() {
+                ruler.loc(squiggle4.pointControls[0], null, main);
                 stage.update();
             });
+            if (ruler.id == currentItem) {
+                timeout(500, function() {
+                    frame.asset("correct.wav").play();
+                })
+            }
         });
             // pointsLabel.background.color = red;
         function goToMiniGame(pointsLabel) {
             pointsLabel.background.color = red;
             timeout(1000, function() {
-                pages.go(detention, "right");
                 makeMiniGame();
+                pages.go(detention, "right");
             })
         }
     }
 
     // MINI GAME
     function makeMiniGame() {
+        var resultText = "";
         var miniGameResult = new Label({
-            text: "",
+            text: resultText,
             size: 100,
             color: "#FFFFB6",
             align: "center"
         }).center(detention).mov(null, -200);
         var num1 = rand(1,10);
         var num2 = rand(1,10);
-        var equation = num1 + "   +   " + num2 + "   =   ";
+        var equation = "";
+        equation = num1 + "   +   " + num2 + "   =   ";
         var index = new Label(equation + "?", 150, null, "#FFFFB6" ).center(detention);
         var ans= num1 + num2;
         // new Label(ans).pos(750,450)
 
-        var userAns = new TextArea({
-            width: 150,
-            height: 150,
-            size: 150,
-            color:"#FFFFB6"
-        }).center(detention).mov(-100, 200);
-        userAns.on("input", function() {
-            index.text = equation + userAns.text;
+        // var userAns = new TextArea({
+        //     width: 150,
+        //     height: 150,
+        //     size: 150,
+        //     color:"#FFFFB6"
+        // }).center(detention).mov(-100, 200);
+        var userAns = new Stepper({
+            stepperType:"number",
+            min:1,
+            max:20,
+            backgroundColor:"#FFFFB6",
+            color: "#5C736E"}).center(detention).mov(-150, 200);
+
+        userAns.on("change", function() {
+            index.currentValue = equation + userAns.text;
             stage.update();
         });
         var button = new Button(75, 75, "GO","#FFFFB6","#DDAC40","#5C736E" )
             .sca(2)
             .center(detention)
-            .mov(100, 200)
+            .mov(170, 200)
 
         button.on("click", function () {
-            if (userAns.text == ans){
+            if (userAns.currentValue == ans){
+                frame.asset("correct.wav").play();
                 var title = "Correct! Back to the main game!";
                 miniGameResult.text = title;
                 points = 3;
+                pointsLabel.text = points;
                 timeout(1500, function() {
                     pages.go(main, "left");
                     makeMiniGame();
@@ -430,7 +486,9 @@ frame.on("ready", function() {
             };
         })
     }
-
+    frame.on("resize", function(){
+        pages.resize();
+    });
 
     // record points
     // new TransformManager(squiggle3);
